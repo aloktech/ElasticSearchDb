@@ -13,8 +13,9 @@ import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONArray;
@@ -24,22 +25,26 @@ import org.json.JSONObject;
  *
  * @author Alok
  */
-public class NewClass {
+public class SampleClass {
 
-    NewClass() {
+    SampleClass() {
         String query = null;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("com/imos/sample/query.json")));
-        String line = null;
+        //BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("com/imos/sample/query.json")));
+        BufferedReader reader;
         StringBuilder builder = new StringBuilder();
         try {
+            reader = new BufferedReader(new FileReader("src/main/resources/com/imos/sample/query.json"));
+            String line;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
                 builder.append("\n");
             }
             query = builder.toString();
             System.out.println(query);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(SampleClass.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(NewClass.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SampleClass.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // Construct a new Jest client according to configuration via factory
@@ -54,7 +59,7 @@ public class NewClass {
 //        try {
 //            client.execute(new CreateIndex.Builder("articles").build());
 //        } catch (Exception ex) {
-//            Logger.getLogger(NewClass.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(SampleClass.class.getName()).log(Level.SEVERE, null, ex);
 //        }
         Article source = new Article();
         source.setAuthor("John Ronald Reuel Tolkien");
@@ -64,7 +69,7 @@ public class NewClass {
 //        try {
 //            client.execute(index);
 //        } catch (Exception ex) {
-//            Logger.getLogger(NewClass.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(SampleClass.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 
         Search search = (Search) new Search.Builder(query)
@@ -78,20 +83,20 @@ public class NewClass {
             result = client.execute(search);
             System.out.println(result.getJsonString());
         } catch (Exception ex) {
-            Logger.getLogger(NewClass.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SampleClass.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         JSONObject hits = getResults(result.getJsonString());
         if (hits.has(HITS)) {
             JSONArray array = hits.getJSONArray(HITS);
-            
+
         }
         
     }
 
     public static void main(String[] args) {
 
-        NewClass newClass = new NewClass();
+        new SampleClass();
     }
 
     public final JSONObject getResults(String result) {
